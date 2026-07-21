@@ -14,15 +14,13 @@ __pycache__/
 .pytest_cache/
 build/
 dist_build/
-*.part
+
+# Ready-to-go bundles live on Releases, not in git (only the docs/script are tracked).
+/dist/*.zip
+/dist/*.part*
 
 # Editors / OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-
-# NOTE: dist/*.zip (the ready-to-go offline bundles) ARE committed, via Git LFS.
-
-# ready-to-go bundles are published as Release assets, not committed
-/dist/*.zip
