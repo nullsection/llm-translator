@@ -1,0 +1,28 @@
+# Downloaded at setup (large / machine-specific) — never commit.
+# models/ = Whisper, NLLB, Piper voices, VOICEVOX (fetched by setup)
+# vendor/, bin/ = optional vendored wheels / Python / uv for offline builds
+/models/
+/vendor/
+/bin/
+/logs/
+
+# Python environment / build artifacts
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist_build/
+*.part
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# NOTE: dist/*.zip (the ready-to-go offline bundles) ARE committed, via Git LFS.
+
+# ready-to-go bundles are published as Release assets, not committed
+/dist/*.zip

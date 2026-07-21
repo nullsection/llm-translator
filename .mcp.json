@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "translator": {
+      "command": "uv",
+      "args": ["run", "translator", "serve"]
+    }
+  }
+}

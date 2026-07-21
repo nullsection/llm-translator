@@ -1,0 +1,61 @@
+[project]
+name = "translator"
+version = "0.1.0"
+description = "Portable, fully-offline audio translator (speech -> text -> translation -> speech) with a CLI and an MCP server for Claude Code."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Mitchell" }]
+dependencies = [
+    "faster-whisper>=1.0.0",   # ASR (speech -> text), CTranslate2 Whisper, bundles PyAV
+    "argostranslate>=1.9.0",   # MT (text -> text), fully offline language packages
+    "piper-tts>=1.2.0",        # TTS (text -> speech), lightweight ONNX voices
+    "mcp>=1.2.0",              # MCP server SDK (FastMCP) for Claude Code integration
+    "typer>=0.12.0",           # CLI front-end
+    "soundfile>=0.12.1",       # read/write wav
+    "numpy>=1.24",
+    "requests>=2.31",          # download Piper voices on demand
+    "sounddevice>=0.4.6",      # live mic capture + playback to a chosen device (bundles PortAudio)
+    "PySide6>=6.6",            # desktop GUI front-end
+    # Japanese TTS (offline, ONNX, no torch). Not on PyPI — direct release wheel,
+    # Windows-only (abi3 cp310+, works on 3.11). Assets live under models/voicevox.
+    "voicevox-core @ https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.4/voicevox_core-0.16.4-cp310-abi3-win_amd64.whl ; sys_platform == 'win32'",
+]
+
+[project.scripts]
+translator = "translator.cli:app"
+
+# --- Trimmed build ---------------------------------------------------------
+# Argos declares stanza + spacy as dependencies; stanza pulls in torch (~500MB)
+# and spacy adds ~150MB, none of which we use because we force the ONNX MiniSBD
+# sentence splitter (see config.py). Override Argos's metadata so uv never
+# resolves those subtrees. config.py injects a stub `stanza` so the unconditional
+# `import stanza` in argostranslate.sbd still succeeds.
+[[tool.uv.dependency-metadata]]
+name = "argostranslate"
+version = "1.11.0"
+requires-dist = [
+    "ctranslate2>=4.0,<5",
+    "minisbd",
+    "packaging",
+    "sacremoses>=0.0.53,<0.2",
+    "sentencepiece>=0.2.0,<0.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true  # permit the voicevox-core release-wheel URL dependency
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/translator"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
