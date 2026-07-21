@@ -6,6 +6,8 @@ own PC. No API keys, no cloud, no subscription.
 Built from Whisper (speech to text), NLLB-200 (translation), and Piper / VOICEVOX (text to speech).
 Supports around 45 languages.
 
+![The llm-translator desktop application](docs/screenshot.png)
+
 ## Getting started (Windows)
 
 ### Option 1 — download and run (nothing to install)
@@ -102,17 +104,31 @@ from the Voices panel.
 ## Choosing a model
 
 All three models translate roughly 45 languages offline. A larger model is somewhat more fluent but
-slower and larger on disk.
+slower and larger on disk. Speeds below are for a short sentence on a desktop CPU.
 
-| Model | Size    | Speed          | Quality                                    |
-|-------|---------|----------------|--------------------------------------------|
-| 600M  | ~0.6 GB | fastest        | good                                       |
-| 1.3B  | ~1.4 GB | fast (~0.2 s)  | very good; matches Google when translating into English |
-| 3.3B  | ~3.2 GB | ~2x slower     | best                                        |
+| Model | Size    | Speed    | Quality                                           |
+|-------|---------|----------|---------------------------------------------------|
+| 600M  | ~0.6 GB | ~0.12 s  | good                                              |
+| 1.3B  | ~1.4 GB | ~0.20 s  | very good; matches Google when translating into English |
+| 3.3B  | ~3.2 GB | ~0.42 s  | best                                              |
 
 To switch models later, delete the `models/nllb` folder and run `setup.bat <size>` again, or
 download the matching bundle. A GPU is used automatically when the CUDA runtime is installed;
 otherwise the app runs on CPU.
+
+### Side-by-side output
+
+The same sentences through each model. For everyday input the results are nearly identical; the
+larger models mainly help on harder, idiomatic phrasing (for example, only 3.3B renders "raining
+cats and dogs" as heavy rain rather than translating it literally).
+
+| Input | 600M | 1.3B | 3.3B |
+|-------|------|------|------|
+| EN to JA: "Where is the nearest subway station?" | 最寄りの地下鉄駅はどこですか | same | same |
+| EN to ZH: "...rescheduled to next Monday at 10 a.m." | 会议被重新安排到下周一上午10点 | 会议已重新安排为下周一早上10点 | 会议已重新安排到下周一上午10点 |
+| EN to JA (idiom): "It's raining cats and dogs." | 外は猫と犬の雨だ | 外は猫と犬の雨が降っている | 外は大雨が降っている |
+| JA to EN (polite): "...恐縮ですが、ご確認いただけますでしょうか。" | I'm afraid you're too busy, but can you check? | I'm afraid you're a little busy, but can you confirm that? | I'm afraid you're busy, but could you check? |
+| ZH to EN: "麻烦你把窗户关一下，谢谢。" | Please close the window, thank you | same | same |
 
 ## Command line
 
