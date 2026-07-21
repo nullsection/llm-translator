@@ -45,6 +45,60 @@ On macOS or Linux, run `./setup.sh` then `uv run translator gui`.
 English, Chinese, and Japanese voices are included. For any other language, open the Voices panel
 and click Download to enable speech. Languages without an installed voice show translated text only.
 
+## Supported languages
+
+Every language below can be translated as text, fully offline. Speech output requires a voice:
+English, Chinese, and Japanese voices are included; every other language's voice can be downloaded
+from the Voices panel.
+
+| Language | Code | Text translation | Voice (speech) |
+|----------|------|------------------|----------------|
+| English | en | Yes | Included |
+| Japanese | ja | Yes | Included |
+| Chinese (Mandarin) | zh | Yes | Included |
+| Albanian | sq | Yes | Downloadable |
+| Arabic | ar | Yes | Downloadable |
+| Bengali | bn | Yes | Downloadable |
+| Bulgarian | bg | Yes | Downloadable |
+| Catalan | ca | Yes | Downloadable |
+| Czech | cs | Yes | Downloadable |
+| Danish | da | Yes | Downloadable |
+| Dutch | nl | Yes | Downloadable |
+| Finnish | fi | Yes | Downloadable |
+| French | fr | Yes | Downloadable |
+| Georgian | ka | Yes | Downloadable |
+| German | de | Yes | Downloadable |
+| Greek | el | Yes | Downloadable |
+| Hindi | hi | Yes | Downloadable |
+| Hungarian | hu | Yes | Downloadable |
+| Icelandic | is | Yes | Downloadable |
+| Indonesian | id | Yes | Downloadable |
+| Italian | it | Yes | Downloadable |
+| Kazakh | kk | Yes | Downloadable |
+| Kurdish | ku | Yes | Downloadable |
+| Latvian | lv | Yes | Downloadable |
+| Luxembourgish | lb | Yes | Downloadable |
+| Malayalam | ml | Yes | Downloadable |
+| Nepali | ne | Yes | Downloadable |
+| Norwegian | no | Yes | Downloadable |
+| Persian | fa | Yes | Downloadable |
+| Polish | pl | Yes | Downloadable |
+| Portuguese | pt | Yes | Downloadable |
+| Romanian | ro | Yes | Downloadable |
+| Russian | ru | Yes | Downloadable |
+| Serbian | sr | Yes | Downloadable |
+| Slovak | sk | Yes | Downloadable |
+| Slovenian | sl | Yes | Downloadable |
+| Spanish | es | Yes | Downloadable |
+| Swahili | sw | Yes | Downloadable |
+| Swedish | sv | Yes | Downloadable |
+| Telugu | te | Yes | Downloadable |
+| Turkish | tr | Yes | Downloadable |
+| Ukrainian | uk | Yes | Downloadable |
+| Urdu | ur | Yes | Downloadable |
+| Vietnamese | vi | Yes | Downloadable |
+| Welsh | cy | Yes | Downloadable |
+
 ## Choosing a model
 
 All three models translate roughly 45 languages offline. A larger model is somewhat more fluent but
