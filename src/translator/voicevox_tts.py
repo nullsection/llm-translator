@@ -33,7 +33,17 @@ def _vvm_files() -> list[Path]:
 
 
 def available() -> bool:
-    """True if the VOICEVOX runtime, dictionary, and at least one model are present."""
+    """True if VOICEVOX can actually synthesize here.
+
+    Requires the ``voicevox_core`` engine to be importable (it only installs on
+    Windows) AND the runtime, dictionary, and a model to be present. Checking the
+    module — not just the files — keeps this correct on Linux/macOS, where the files
+    might exist (e.g. a reused cache) but the engine is not installed.
+    """
+    import importlib.util
+
+    if importlib.util.find_spec("voicevox_core") is None:
+        return False
     try:
         return _runtime_dll().exists() and _dict_dir().exists() and bool(_vvm_files())
     except FileNotFoundError:

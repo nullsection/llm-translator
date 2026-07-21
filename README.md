@@ -33,7 +33,7 @@ run-gui.bat        # launch
 ```
 
 Choose a different model with `setup.bat 600M` (fastest) or `setup.bat 3.3B` (best quality).
-On macOS or Linux, run `./setup.sh` then `uv run translator gui`.
+On Linux (or macOS), run `./setup.sh` then `uv run translator gui` — see Platform support below.
 
 ## Using the app
 
@@ -142,6 +142,17 @@ translator doctor                                  # environment health check
 ```
 
 Prefix commands with `uv run` if you built from source rather than downloading a bundle.
+
+## Platform support
+
+- **Windows 10/11** — fully supported, including the one-click offline bundles and Japanese speech.
+- **Linux** — verified on Ubuntu (installs via `setup.sh`): speech recognition, translation, and
+  Piper voices (English, Chinese, and the downloadable languages) all work. Japanese *speech* uses
+  VOICEVOX, which is currently wired up for Windows only, so on Linux Japanese is **text-only** (it
+  still transcribes and translates). The live microphone and the desktop window additionally need
+  system audio (`libportaudio2`) and a graphical display.
+- **macOS** — uses the same cross-platform components and should behave like Linux, but this has
+  **not been tested**. Consider it experimental.
 
 ## Licenses
 
