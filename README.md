@@ -1,102 +1,99 @@
-# Offline Voice Translator
+# 🗣️ llm-translator
 
-Speak or type in one language → get text **and** speech in another, **fully offline** on your
-PC. Desktop GUI, plus a CLI and an MCP server for Claude Code. No API keys, no cloud, no cost.
+**Speak or type in one language — get it back as text *and* speech in another. 100% offline.**
+No API keys, no cloud, no subscription. Everything runs on your own PC.
 
-```
-audio/text ─▶ Whisper (speech→text) ─▶ NLLB-200 (translate) ─▶ Piper / VOICEVOX (text→speech)
-```
+Built from Whisper (speech → text), NLLB-200 (translation), and Piper / VOICEVOX (text → speech).
+~45 languages.
 
-- **Offline & private** — everything runs locally after a one-time model download.
-- **~45 languages** translate offline via one bundled NLLB-200 model — no per-language packs.
-- **Speak or type** — record from a mic, or type into the box; both translate (+ speak).
-- **Voices on demand** — English/Chinese (Piper) and Japanese (VOICEVOX) install by default;
-  download any other language's voice from the app when you want to *hear* it.
-- **Pick your model size** at setup — trade speed for quality (see below).
+---
 
-## Requirements
+## 🚀 Get started (Windows)
 
-- **Windows 10/11** (recommended — Japanese speech via VOICEVOX is Windows-only).
-  macOS/Linux work too, but Japanese stays text-only there.
-- That's it — [`uv`](https://docs.astral.sh/uv/) and Python are installed automatically by setup.
-- ~2–6 GB free disk depending on the model you pick.
+### ⭐ Easiest — download and run (nothing to install)
 
-## Two ways to get it
+1. Open the **[Releases page](https://github.com/nullsection/llm-translator/releases/latest)** and grab a bundle:
+   - **`translator-offline-1.3B.zip`** — recommended (~1.9 GB).
+   - **3.3B** (best quality) is split into parts — see the quick rejoin step in
+     **[dist/README.md](dist/README.md)** (download the parts + `reassemble-3.3B.bat`, double-click it).
+2. **Unzip** it anywhere.
+3. Double-click **`run-gui.bat`**. The first launch sets itself up (~1 minute), then the app opens.
 
-**A. Download a ready-to-go bundle (no setup, fully offline).** Grab one zip from
-[`dist/`](dist/) — everything is included (Python, deps, models, voices), unzip, double-click
-`run-gui.bat`. See [dist/README.md](dist/README.md).
+Fully offline from there on. 🎉
 
-| Bundle | Model | Size |
-|--------|-------|-----:|
-| `dist/translator-offline-1.3B.zip` | 1.3B (recommended) | ~2.0 GB |
-| `dist/translator-offline-3.3B.zip` | 3.3B (best quality) | ~3.7 GB |
-
-**B. Clone and build** (smaller download — grabs only the model you pick):
+### 🛠️ Or build it yourself (smaller download)
 
 ```powershell
-git clone <this-repo-url> translator
-cd translator
-setup.bat            REM installs everything + the default 1.3B model (recommended)
-run-gui.bat          REM launch the app
+git clone https://github.com/nullsection/llm-translator
+cd llm-translator
+setup.bat          REM installs everything + the 1.3B model
+run-gui.bat        REM launch
 ```
 
-Want a different model? Pass it to setup:
+Want a different model? `setup.bat 600M` (fastest) or `setup.bat 3.3B` (best quality).
+macOS/Linux: `./setup.sh` then `uv run translator gui`.
+
+---
+
+## 🎧 How to use it
+
+1. Pick your **microphone** and **speaker**, and choose **From → To** languages.
+2. Translate in either way:
+   - **🎙️ Speak** — click **● Record**, talk, click **■ Stop**.
+   - **⌨️ Type** — type into the top box and click **Translate text**.
+3. You'll see the translation on screen, and hear it **spoken aloud** (when a voice for that
+   language is installed).
+
+**Voices:** English, Chinese, and Japanese speak out of the box. For any other language, open the
+**Voices** panel and click **Download** — then it speaks too. Languages without a voice just show
+the translated text.
+
+---
+
+## 🧠 Which model should I pick?
+
+All three translate ~45 languages offline. Bigger = a little more fluent, but slower and larger.
+
+| Model | Size | Speed | Quality |
+|-------|-----:|-------|---------|
+| **600M** | ~0.6 GB | fastest | good |
+| **1.3B** ⭐ | ~1.4 GB | fast (~0.2 s) | very good — matches Google *into English* |
+| **3.3B** | ~3.2 GB | ~2× slower | best |
+
+You can switch anytime: delete `models/nllb` and run `setup.bat <size>` again (or download the
+matching bundle). A GPU is used automatically if you have the CUDA runtime installed; otherwise it
+runs on CPU.
+
+---
+
+## 💻 Command line (optional)
 
 ```powershell
-setup.bat 600M       REM fastest, smallest
-setup.bat 1.3B       REM default — best balance
-setup.bat 3.3B       REM best quality, ~2x slower, bigger
+translator gui                                   # the desktop app
+translator text "Where is the station?" --to ja  # translate typed text
+translator translate clip.wav --to zh --out zh.wav
+translator voices                                # list / manage voices
+translator get-voice fr                          # download a voice
+translator doctor                                # health check
 ```
+(Prefix with `uv run` if you cloned rather than downloaded a bundle.)
 
-macOS/Linux: `./setup.sh 1.3B` then `uv run translator gui`.
+---
 
-## Choosing a translation model
+## 📝 Licenses
 
-All three are NLLB-200 (one model, ~45 languages, direct — no English pivot). Bigger = a bit
-more fluent, slower, larger. Measured on a fast desktop CPU:
+The code is **MIT**. The models it uses have their own terms — most are permissive, but two to know:
 
-| Model | Download | Short sentence | Quality |
-|-------|---------:|---------------:|---------|
-| **600M** | ~0.6 GB | ~0.15 s | good |
-| **1.3B** (default) | ~1.4 GB | ~0.22 s | very good — on par with Google into English |
-| **3.3B** | ~3.2 GB | ~0.43 s | best; occasionally beats Google, ~2× slower |
+- **NLLB-200** (translation) is **non-commercial** (CC-BY-NC). For commercial use, set
+  `TRANSLATOR_MT=argos` to switch to the unrestricted (lower-quality) Argos engine.
+- **VOICEVOX** (Japanese voice) asks for a small credit line if you **publish** its audio.
 
-To switch later: delete the `models/nllb` folder and run `setup.bat <size>` again. GPU is used
-automatically if a CUDA runtime is installed, otherwise it runs on CPU.
+Full details in **[NOTICE.md](NOTICE.md)**.
 
-## Using the app
+---
 
-- **From / To** menus list every language — all translate offline.
-- **Record** to speak (Whisper auto-detects the language), or **type** into the Source box and
-  press **Translate text**.
-- **Voices** panel: download a Piper voice for any language to hear it spoken (needs internet
-  once). Languages without an installed voice show translated text only.
-- Spoken translations drop `! ? ,` by default (speech can't reliably infer them); toggle off in
-  the app if you want them.
+## ❓ Trouble?
 
-## Command line
-
-```powershell
-uv run translator gui                              # desktop app
-uv run translator text "Where is the station?" --to ja --speak
-uv run translator translate clip.wav --to zh --out zh.wav
-uv run translator voices                           # list / manage speech voices
-uv run translator get-voice fr                     # download a voice by hand
-uv run translator doctor                           # diagnose the install
-uv run translator serve                            # MCP server for Claude Code
-```
-
-## Licences
-
-Source code is MIT (see `LICENSE`). Downloaded models carry their own terms — most permissive,
-but note two: **NLLB-200 is CC-BY-NC (non-commercial)** and **VOICEVOX** asks for a credit line
-when you publish its Japanese audio. Full details in **[NOTICE.md](NOTICE.md)**. For commercial
-use, set `TRANSLATOR_MT=argos` to fall back to the unrestricted (lower-quality) Argos backend.
-
-## Development
-
-```powershell
-uv sync --dev
-uv run pytest
-```
+- Run **`translator doctor`** — it checks the model, voices, audio devices, and does a quick
+  self-test.
+- Look in **`logs/translator.log`** for details of any error.
