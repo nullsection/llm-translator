@@ -20,7 +20,7 @@ copy /b "translator-offline-3.3B.zip.part*" "translator-offline-3.3B.zip" >nul
 if not exist "translator-offline-3.3B.zip" ( echo FAILED. & pause & exit /b 1 )
 
 echo Verifying checksum ...
-set "EXPECTED=6eb7c9761c2021b025a32aa2ce4a9bf1912ba31118643892c4817a2ee67c7c70"
+set "EXPECTED=4af0b2d682888a9822c6fcc82d39a124b13b08e537a72d1ad36a34635bdf2757"
 set "ACTUAL="
 for /f "usebackq skip=1 delims=" %%H in (`certutil -hashfile "translator-offline-3.3B.zip" SHA256`) do if not defined ACTUAL set "ACTUAL=%%H"
 set "ACTUAL=%ACTUAL: =%"
