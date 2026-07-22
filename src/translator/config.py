@@ -115,10 +115,13 @@ class Language:
     name: str
     piper_voice: str | None      # default Piper voice id, or None (see rhasspy/piper-voices)
     nllb_code: str               # FLORES-200 code for NLLB-200 (e.g. eng_Latn)
-    voicevox_style: int | None = None  # VOICEVOX style id for TTS (Japanese)
-    # Extra selectable voices, e.g. (("Female", "en_US-hfc_female-medium"), ...).
+    voicevox_style: int | None = None  # default VOICEVOX style id for TTS (Japanese)
+    # Extra selectable Piper voices, e.g. (("Female", "en_US-hfc_female-medium"), ...).
     # Downloaded on demand; shown as a voice picker in the GUI where present.
     alt_voices: tuple[tuple[str, str], ...] = ()
+    # Selectable VOICEVOX styles for a Japanese-style language, e.g.
+    # (("Female", 2), ("Male", 11)). All bundled (no download); shown as a picker.
+    voicevox_styles: tuple[tuple[str, int], ...] = ()
 
 
 # Translation works for EVERY language below offline via NLLB-200 (one bundled
@@ -129,7 +132,8 @@ class Language:
 LANGUAGES: dict[str, Language] = {
     "en": Language("en", "English", "en_US-lessac-medium", "eng_Latn",
                    alt_voices=(("Female", "en_US-hfc_female-medium"), ("Male", "en_US-hfc_male-medium"))),
-    "ja": Language("ja", "Japanese", None, "jpn_Jpan", voicevox_style=2),  # Piper none; VOICEVOX
+    "ja": Language("ja", "Japanese", None, "jpn_Jpan", voicevox_style=2,  # VOICEVOX (no Piper)
+                   voicevox_styles=(("Female", 2), ("Male", 11))),  # 四国めたん / 玄野武宏
     "zh": Language("zh", "Chinese (Mandarin)", "zh_CN-huayan-medium", "zho_Hans"),
     "sq": Language("sq", "Albanian", "sq_AL-edon-medium", "als_Latn"),
     "ar": Language("ar", "Arabic", "ar_JO-kareem-medium", "arb_Arab"),
@@ -187,26 +191,46 @@ _selected_voice: dict[str, str] = {}
 
 
 def voice_choices(code: str) -> list[tuple[str, str]]:
-    """Selectable Piper voices for a language: [(label, voice_id), ...].
+    """Selectable voices for a language: [(label, token), ...].
 
-    The default voice comes first; any ``alt_voices`` (e.g. Female/Male) follow.
-    Empty for languages with no Piper voice (e.g. Japanese uses VOICEVOX).
+    Piper languages list their default voice first, then any ``alt_voices`` (e.g.
+    Female/Male) — the token is the Piper voice id. VOICEVOX languages (Japanese)
+    list their ``voicevox_styles`` — the token is the style id as a string. Empty
+    for languages with neither extra option.
     """
     lang = get_language(code)
-    if lang.piper_voice is None:
-        return []
-    return [("Default", lang.piper_voice), *lang.alt_voices]
+    if lang.piper_voice is not None:
+        return [("Default", lang.piper_voice), *lang.alt_voices]
+    if lang.voicevox_style is not None:
+        return [(label, str(style)) for label, style in lang.voicevox_styles]
+    return []
 
 
-def select_voice(code: str, voice_id: str) -> None:
-    """Choose which Piper voice to speak this language with (used by the GUI)."""
-    _selected_voice[normalize_lang(code)] = voice_id
+def select_voice(code: str, token: str) -> None:
+    """Choose which voice to speak this language with (used by the GUI).
+
+    ``token`` is a Piper voice id for Piper languages, or a VOICEVOX style id (as a
+    string) for Japanese-style languages — i.e. one of the values from
+    :func:`voice_choices`.
+    """
+    _selected_voice[normalize_lang(code)] = token
 
 
 def active_voice(code: str) -> str | None:
-    """The Piper voice id currently chosen for this language (default if unset)."""
+    """The voice token currently chosen for this language (default if unset).
+
+    A Piper voice id for Piper languages, or the VOICEVOX style id (as a string)
+    for Japanese-style languages; ``None`` if the language has no voice at all.
+    """
     code = normalize_lang(code)
-    return _selected_voice.get(code, get_language(code).piper_voice)
+    if code in _selected_voice:
+        return _selected_voice[code]
+    lang = get_language(code)
+    if lang.piper_voice is not None:
+        return lang.piper_voice
+    if lang.voicevox_style is not None:
+        return str(lang.voicevox_style)
+    return None
 
 
 def get_language(code: str) -> Language:

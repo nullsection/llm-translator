@@ -115,7 +115,9 @@ def synthesize(text: str, lang: str, out_path: str | Path) -> Path:
     if lang_obj.piper_voice is None and lang_obj.voicevox_style is not None:
         from . import voicevox_tts
 
-        return voicevox_tts.synthesize(text, lang_obj.voicevox_style, out_path)
+        tok = config.active_voice(lang)  # selected VOICEVOX style (as a string)
+        style = int(tok) if tok is not None else lang_obj.voicevox_style
+        return voicevox_tts.synthesize(text, style, out_path)
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -77,9 +77,11 @@ def ensure_assets() -> None:
             with open(exe, "wb") as f:
                 for chunk in r.iter_content(chunk_size=1 << 16):
                     f.write(chunk)
+    # 0.vvm = 四国めたん (female default); 4.vvm = 玄野武宏 (male). The glob
+    # "[04].vvm" matches exactly those two files (not 14.vvm etc.).
     subprocess.run(
         [str(exe), "--only", "onnxruntime", "dict", "models",
-         "--models-pattern", "0.vvm", "--output", str(config.VOICEVOX_DIR)],
+         "--models-pattern", "[04].vvm", "--output", str(config.VOICEVOX_DIR)],
         input=b"y\n" * 5, check=True,
     )
     exe.unlink(missing_ok=True)

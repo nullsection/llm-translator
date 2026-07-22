@@ -93,9 +93,11 @@ class PipelineWorker(QThread):
                 self.status.emit(f"Ready ({name} — text only; download its voice to hear it)")
                 return
 
-            _av = config.active_voice(self._target)
-            if _av and not tts.voice_files_present(_av):
-                self.status.emit("Downloading voice…")
+            # Piper alt voices download on first use; VOICEVOX styles are bundled.
+            if config.get_language(self._target).piper_voice is not None:
+                _av = config.active_voice(self._target)
+                if _av and not tts.voice_files_present(_av):
+                    self.status.emit("Downloading voice…")
             self.status.emit("Synthesizing…")
             tts.synthesize(translated, self._target, _TTS_TMP)
             samples, sr = audio.read_wav(_TTS_TMP)
@@ -144,9 +146,11 @@ class TranslateTextWorker(QThread):
                 self.status.emit(f"Ready ({name} — text only; download its voice to hear it)")
                 return
 
-            _av = config.active_voice(self._target)
-            if _av and not tts.voice_files_present(_av):
-                self.status.emit("Downloading voice…")
+            # Piper alt voices download on first use; VOICEVOX styles are bundled.
+            if config.get_language(self._target).piper_voice is not None:
+                _av = config.active_voice(self._target)
+                if _av and not tts.voice_files_present(_av):
+                    self.status.emit("Downloading voice…")
             self.status.emit("Synthesizing…")
             tts.synthesize(translated, self._target, _TTS_TMP)
             samples, sr = audio.read_wav(_TTS_TMP)
@@ -325,10 +329,12 @@ class TranslatorWindow(QMainWindow):
         self.voice_pick.blockSignals(True)
         self.voice_pick.clear()
         choices = config.voice_choices(to) if to else []
+        is_piper = bool(to) and config.get_language(to).piper_voice is not None
         for label, vid in choices:
-            mark = "" if tts.voice_files_present(vid) else "  (downloads on use)"
+            # Piper alt voices download on first use; VOICEVOX styles are bundled.
+            mark = "  (downloads on use)" if is_piper and not tts.voice_files_present(vid) else ""
             self.voice_pick.addItem(f"{label}{mark}", vid)
-        # Only meaningful when there's a real choice (e.g. English male/female).
+        # Only meaningful when there's a real choice (e.g. English/Japanese male/female).
         self.voice_pick.setEnabled(len(choices) > 1)
         self.voice_pick.blockSignals(False)
         if choices:
