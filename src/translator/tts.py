@@ -58,19 +58,18 @@ def _download(url: str, dest: Path, attempts: int = 3) -> None:
     raise ConnectionError(f"Could not download voice after {attempts} tries: {last}")
 
 
-def ensure_voice(lang: str) -> Path:
-    """Ensure the Piper voice for ``lang`` is present locally; return its .onnx path.
+def voice_files_present(voice_id: str) -> bool:
+    """True if both files of a specific Piper voice id are present locally."""
+    return (config.TTS_DIR / f"{voice_id}.onnx").exists() and (config.TTS_DIR / f"{voice_id}.onnx.json").exists()
+
+
+def ensure_voice_id(voice_id: str) -> Path:
+    """Ensure a specific Piper voice id is present locally; return its .onnx path.
 
     Downloads both required files (model + config); leaves nothing half-installed
     (a failed config download removes the orphan model so state stays consistent).
     """
     config.ensure_dirs()
-    voice_id = config.get_language(lang).piper_voice
-    if voice_id is None:
-        raise RuntimeError(
-            f"No offline speech voice is available for '{lang}'. "
-            "It can be transcribed and translated, but not spoken."
-        )
     onnx = config.TTS_DIR / f"{voice_id}.onnx"
     cfg = config.TTS_DIR / f"{voice_id}.onnx.json"
     if onnx.exists() and cfg.exists():
@@ -86,6 +85,17 @@ def ensure_voice(lang: str) -> Path:
             onnx.unlink(missing_ok=True)  # don't leave a model without its config
         raise
     return onnx
+
+
+def ensure_voice(lang: str) -> Path:
+    """Ensure the currently selected Piper voice for ``lang`` is present locally."""
+    voice_id = config.active_voice(lang)
+    if voice_id is None:
+        raise RuntimeError(
+            f"No offline speech voice is available for '{lang}'. "
+            "It can be transcribed and translated, but not spoken."
+        )
+    return ensure_voice_id(voice_id)
 
 
 @lru_cache(maxsize=4)

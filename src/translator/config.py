@@ -113,9 +113,12 @@ def setup_logging() -> None:
 class Language:
     code: str                    # ISO 639-1, used by Whisper + Argos
     name: str
-    piper_voice: str | None      # Piper voice id, or None (see rhasspy/piper-voices)
+    piper_voice: str | None      # default Piper voice id, or None (see rhasspy/piper-voices)
     nllb_code: str               # FLORES-200 code for NLLB-200 (e.g. eng_Latn)
     voicevox_style: int | None = None  # VOICEVOX style id for TTS (Japanese)
+    # Extra selectable voices, e.g. (("Female", "en_US-hfc_female-medium"), ...).
+    # Downloaded on demand; shown as a voice picker in the GUI where present.
+    alt_voices: tuple[tuple[str, str], ...] = ()
 
 
 # Translation works for EVERY language below offline via NLLB-200 (one bundled
@@ -124,7 +127,8 @@ class Language:
 # en/ja/zh ship with their voices bundled (en/zh Piper, ja VOICEVOX); the rest are
 # translate-now, download-a-voice-to-speak. Voice ids are from Piper's voices.json.
 LANGUAGES: dict[str, Language] = {
-    "en": Language("en", "English", "en_US-lessac-medium", "eng_Latn"),
+    "en": Language("en", "English", "en_US-lessac-medium", "eng_Latn",
+                   alt_voices=(("Female", "en_US-hfc_female-medium"), ("Male", "en_US-hfc_male-medium"))),
     "ja": Language("ja", "Japanese", None, "jpn_Jpan", voicevox_style=2),  # Piper none; VOICEVOX
     "zh": Language("zh", "Chinese (Mandarin)", "zh_CN-huayan-medium", "zho_Hans"),
     "sq": Language("sq", "Albanian", "sq_AL-edon-medium", "als_Latn"),
@@ -176,6 +180,33 @@ def has_voice(code: str) -> bool:
     """True if this language can be synthesized to speech (Piper or VOICEVOX)."""
     lang = get_language(code)
     return lang.piper_voice is not None or lang.voicevox_style is not None
+
+
+# --- Selectable Piper voice per language (e.g. male/female) ----------------
+_selected_voice: dict[str, str] = {}
+
+
+def voice_choices(code: str) -> list[tuple[str, str]]:
+    """Selectable Piper voices for a language: [(label, voice_id), ...].
+
+    The default voice comes first; any ``alt_voices`` (e.g. Female/Male) follow.
+    Empty for languages with no Piper voice (e.g. Japanese uses VOICEVOX).
+    """
+    lang = get_language(code)
+    if lang.piper_voice is None:
+        return []
+    return [("Default", lang.piper_voice), *lang.alt_voices]
+
+
+def select_voice(code: str, voice_id: str) -> None:
+    """Choose which Piper voice to speak this language with (used by the GUI)."""
+    _selected_voice[normalize_lang(code)] = voice_id
+
+
+def active_voice(code: str) -> str | None:
+    """The Piper voice id currently chosen for this language (default if unset)."""
+    code = normalize_lang(code)
+    return _selected_voice.get(code, get_language(code).piper_voice)
 
 
 def get_language(code: str) -> Language:

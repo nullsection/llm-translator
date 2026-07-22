@@ -93,6 +93,9 @@ class PipelineWorker(QThread):
                 self.status.emit(f"Ready ({name} — text only; download its voice to hear it)")
                 return
 
+            _av = config.active_voice(self._target)
+            if _av and not tts.voice_files_present(_av):
+                self.status.emit("Downloading voice…")
             self.status.emit("Synthesizing…")
             tts.synthesize(translated, self._target, _TTS_TMP)
             samples, sr = audio.read_wav(_TTS_TMP)
@@ -141,6 +144,9 @@ class TranslateTextWorker(QThread):
                 self.status.emit(f"Ready ({name} — text only; download its voice to hear it)")
                 return
 
+            _av = config.active_voice(self._target)
+            if _av and not tts.voice_files_present(_av):
+                self.status.emit("Downloading voice…")
             self.status.emit("Synthesizing…")
             tts.synthesize(translated, self._target, _TTS_TMP)
             samples, sr = audio.read_wav(_TTS_TMP)
@@ -218,6 +224,10 @@ class TranslatorWindow(QMainWindow):
         self.to_combo = QComboBox()
         lang_form.addRow("From:", self.from_combo)
         lang_form.addRow("To:", self.to_combo)
+        self.voice_pick = QComboBox()  # selectable voice for the target (e.g. Male/Female)
+        self.voice_pick.currentIndexChanged.connect(self._on_voice_pick)
+        self.to_combo.currentIndexChanged.connect(self._refresh_voice_pick)
+        lang_form.addRow("Voice:", self.voice_pick)
         self.accuracy_combo = QComboBox()
         self.accuracy_combo.addItem("Fast (base)", "base")
         self.accuracy_combo.addItem("Accurate (small — downloads once)", "small")
@@ -307,6 +317,28 @@ class TranslatorWindow(QMainWindow):
             self.to_combo.addItem(lang.name, code)
         idx = self.to_combo.findData("ja")
         self.to_combo.setCurrentIndex(idx if idx >= 0 else 0)
+        self._refresh_voice_pick()
+
+    def _refresh_voice_pick(self) -> None:
+        """Populate the target-language voice picker (e.g. Default / Female / Male)."""
+        to = self.to_combo.currentData()
+        self.voice_pick.blockSignals(True)
+        self.voice_pick.clear()
+        choices = config.voice_choices(to) if to else []
+        for label, vid in choices:
+            mark = "" if tts.voice_files_present(vid) else "  (downloads on use)"
+            self.voice_pick.addItem(f"{label}{mark}", vid)
+        # Only meaningful when there's a real choice (e.g. English male/female).
+        self.voice_pick.setEnabled(len(choices) > 1)
+        self.voice_pick.blockSignals(False)
+        if choices:
+            config.select_voice(to, self.voice_pick.currentData())
+
+    def _on_voice_pick(self) -> None:
+        to = self.to_combo.currentData()
+        vid = self.voice_pick.currentData()
+        if to and vid:
+            config.select_voice(to, vid)
 
     # ---- Voice management ------------------------------------------------
     def _refresh_voices(self) -> None:

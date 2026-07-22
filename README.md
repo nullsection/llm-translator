@@ -47,6 +47,10 @@ On Linux (or macOS), run `./setup.sh` then `uv run translator gui` — see Platf
 English, Chinese, and Japanese voices are included. For any other language, open the Voices panel
 and click Download to enable speech. Languages without an installed voice show translated text only.
 
+When the target language offers more than one voice, the **Voice** dropdown lets you pick between
+them — English, for example, offers a male and a female voice. The extra voice downloads the first
+time you use it.
+
 ## Supported languages
 
 Every language below can be translated as text, fully offline. Speech output requires a voice:
