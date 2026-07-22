@@ -13,13 +13,15 @@ Supports around 45 languages.
 ### Option 1 — download and run (nothing to install)
 
 1. Open the [Releases page](https://github.com/nullsection/llm-translator/releases/latest) and
-   download a bundle:
-   - `translator-offline-1.3B.zip` — recommended (about 1.9 GB).
-   - The 3.3B bundle (best quality) is split into parts. Download the parts and
-     `reassemble-3.3B.bat`, then double-click the script to rejoin them. See
-     [dist/README.md](dist/README.md).
-2. Unzip it anywhere.
-3. Double-click `run-gui.bat`. The first launch sets itself up (about a minute), then the app opens.
+   download one bundle. Each is split into parts to stay under GitHub's 2 GB per-file limit:
+   - 1.3B — recommended (about 2.1 GB): `translator-offline-1.3B.zip.part00`, `.part01`, and
+     `reassemble-1.3B.bat`.
+   - 3.3B — best quality (about 3.8 GB): `translator-offline-3.3B.zip.part00` through `.part02`,
+     and `reassemble-3.3B.bat`.
+2. Put the parts and their `reassemble-*.bat` in one folder and double-click the script. It rejoins
+   the parts into a single `.zip` and verifies the checksum. See [dist/README.md](dist/README.md).
+3. Unzip the resulting `.zip` anywhere, then double-click `run-gui.bat`. The first launch sets
+   itself up (about a minute), then the app opens.
 
 It runs fully offline from that point on.
 
@@ -47,9 +49,10 @@ On Linux (or macOS), run `./setup.sh` then `uv run translator gui` — see Platf
 English, Chinese, and Japanese voices are included. For any other language, open the Voices panel
 and click Download to enable speech. Languages without an installed voice show translated text only.
 
-When the target language offers more than one voice, the **Voice** dropdown lets you pick between
-them — English, for example, offers a male and a female voice. The extra voice downloads the first
-time you use it.
+When the target language offers more than one voice, the **Voice** dropdown lets you choose.
+English offers Default, Female, and Male; Japanese offers Female and Male. The Japanese voices are
+bundled, so they work offline immediately; English's extra male and female voices download the
+first time you select them.
 
 ## Supported languages
 
